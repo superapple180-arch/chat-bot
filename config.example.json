@@ -1,0 +1,43 @@
+{
+  "onebot": {
+    "url": "ws://127.0.0.1:3001",
+    "accessToken": "",
+    "selfId": "",
+    "timeoutMs": 10000
+  },
+  "gemini": {
+    "directory": "Gemini",
+    "timeoutMs": 120000
+  },
+  "replyAll": false,
+  "friends": [],
+  "groups": [],
+  "groupAliases": [],
+  "conversation": {
+    "enabled": false,
+    "groupReplyProbability": 0.4,
+    "personas": {},
+    "redact": [],
+    "faceProbability": 0.7,
+    "peakFaceProbability": 0
+  },
+  "attachments": {
+    "enabled": false,
+    "localRoots": [
+      "vendor"
+    ]
+  },
+  "replyStyle": "用简短自然的中文回复，只回答聊天内容，不使用工具、搜索或执行任何操作。",
+  "voice": {
+    "enabled": false,
+    "voice": "zh-CN-XiaoxiaoNeural"
+  },
+  "media": {
+    "enabled": false,
+    "online": false
+  },
+  "realSend": false,
+  "maxQueue": 50,
+  "maxMessageChars": 4000,
+  "maxReplyChars": 8000
+}

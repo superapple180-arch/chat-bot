@@ -1,0 +1,109 @@
+name: Desktop validation and release candidates
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      formal:
+        description: '签名与公证的正式候选包 缺少凭据时构建失败'
+        type: boolean
+        default: false
+permissions:
+  contents: read
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2025, macos-15, macos-15-intel, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run web:build
+  build:
+    if: github.event_name == 'workflow_dispatch'
+    needs: test
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-2025
+            arch: x64
+          - os: macos-15
+            arch: arm64
+          - os: macos-15-intel
+            arch: x64
+          - os: ubuntu-24.04
+            arch: x64
+    runs-on: ${{ matrix.os }}
+    env:
+      CHAT_BOT_FORMAL: ${{ inputs.formal && '1' || '0' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install ggshield==1.54.0
+      - run: npm ci
+      - run: npm ci --prefix desktop-app
+      - name: Review source privacy and complete reachable history
+        env:
+          CHAT_BOT_PRIVATE_VALUES: ${{ secrets.RELEASE_PRIVATE_VALUES }}
+        run: node scripts/release-privacy.mjs . --source --history
+      - name: GitGuardian source gate
+        env:
+          GITGUARDIAN_API_KEY: ${{ secrets.GITGUARDIAN_API_KEY }}
+        run: node scripts/release-guardian.mjs . .
+      - name: Build locally without publishing
+        env:
+          WIN_CSC_LINK: ${{ inputs.formal && secrets.WIN_CSC_LINK || '' }}
+          WIN_CSC_KEY_PASSWORD: ${{ inputs.formal && secrets.WIN_CSC_KEY_PASSWORD || '' }}
+          CSC_LINK: ${{ inputs.formal && secrets.CSC_LINK || '' }}
+          CSC_KEY_PASSWORD: ${{ inputs.formal && secrets.CSC_KEY_PASSWORD || '' }}
+          APPLE_ID: ${{ inputs.formal && secrets.APPLE_ID || '' }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ inputs.formal && secrets.APPLE_APP_SPECIFIC_PASSWORD || '' }}
+          APPLE_TEAM_ID: ${{ inputs.formal && secrets.APPLE_TEAM_ID || '' }}
+        run: npm run desktop:pack -- --${{ matrix.arch }}
+      - name: Extract real installer contents
+        run: node scripts/extract-release.mjs artifacts/desktop .cache/candidate-unpacked
+      - name: Review installed payload privacy
+        env:
+          CHAT_BOT_PRIVATE_VALUES: ${{ secrets.RELEASE_PRIVATE_VALUES }}
+        run: node scripts/review-payload.mjs .cache/candidate-unpacked
+      - name: GitGuardian payload gate
+        env:
+          GITGUARDIAN_API_KEY: ${{ secrets.GITGUARDIAN_API_KEY }}
+        run: node scripts/release-guardian.mjs . .cache/candidate-unpacked
+      # These are scanned candidates, not Releases or an update feed.
+      # Public release additionally requires exact-artifact privacy review.
+      - name: Bind successful automated checks to exact artifacts
+        run: node scripts/build-attestation.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: chat-bot-${{ matrix.os }}-${{ matrix.arch }}
+          path: |
+            artifacts/desktop/*.exe
+            artifacts/desktop/*.dmg
+            artifacts/desktop/*.zip
+            artifacts/desktop/*.deb
+            artifacts/desktop/*.AppImage
+            artifacts/desktop/latest-*.yml
+            artifacts/desktop/*.blockmap
+            artifacts/desktop/release-safety.json
+            artifacts/desktop/build-platform.json
+          if-no-files-found: error

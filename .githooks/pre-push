@@ -1,0 +1,5 @@
+#!/bin/sh
+set -eu
+node scripts/source-publication-gate.mjs .
+node scripts/release-privacy.mjs . --source --history
+node scripts/release-guardian.mjs . .

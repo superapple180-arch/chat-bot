@@ -1,0 +1,14 @@
+{
+  "name": "chat-bot",
+  "version": "0.2.3",
+  "description": "非商业 QQ 聊天助手",
+  "author": {
+    "name": "chat-bot contributors",
+    "email": "chat-bot@users.noreply.github.com"
+  },
+  "license": "MIT",
+  "main": "main.cjs",
+  "dependencies": {
+    "electron-updater": "6.8.11"
+  }
+}
