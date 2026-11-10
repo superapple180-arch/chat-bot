@@ -264,7 +264,7 @@ test('Antigravity settings validated while legacy Gemini config stays compatible
   c.onebot.selfId = '10000'; c.onebot.accessToken = 'synthetic-token-0123456789';
   fs.writeFileSync(path.join(path.dirname(file), '.env'), 'ONEBOT_ACCESS_TOKEN=' + c.onebot.accessToken + '\n');
   fs.writeFileSync(file, JSON.stringify(c)); assert.equal(readConfig(file).provider, 'antigravity');
-  for (const patch of [{ timeoutMs: 0 }, { timeoutMs: 300001 }, { executable: 'agy.cmd' }, { model: '--unsafe arg' }, { tlsCompatibility: 'true' }, { proxyUrl: 'http://example.com:7890' }, { proxyUrl: 'https://127.0.0.1:7890' }, { proxyUrl: 'http://user:pass@127.0.0.1:7890' }, { proxyUrl: 'http://127.0.0.1:7890/path' }, { proxyUrl: 'invalid' }]) {
+  for (const patch of [{ timeoutMs: 0 }, { timeoutMs: 300001 }, { executable: 'agy\n' }, ...(process.platform === 'win32' ? [{ executable: 'agy.cmd' }] : []), { model: '--unsafe arg' }, { tlsCompatibility: 'true' }, { proxyUrl: 'http://example.com:7890' }, { proxyUrl: 'https://127.0.0.1:7890' }, { proxyUrl: 'http://user:pass@127.0.0.1:7890' }, { proxyUrl: 'http://127.0.0.1:7890/path' }, { proxyUrl: 'invalid' }]) {
     fs.writeFileSync(file, JSON.stringify({ ...c, antigravity: { ...c.antigravity, ...patch } })); assert.throws(() => readConfig(file));
   }
 });
