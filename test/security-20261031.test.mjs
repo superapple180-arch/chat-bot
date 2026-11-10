@@ -101,7 +101,9 @@ test('a model cannot upgrade one message into ongoing chat or select a name only
 test('attachment completion proof requires a matching successful post-tool event', t => {
   const f = fixture(t), nonce = randomUUID(), conversationId = randomUUID(), image = path.join(f.dir, 'synthetic.png');
   fs.writeFileSync(image, 'SYNTHETIC_ONLY');
-  const hash = createHash('sha256').update(fs.readFileSync(image)).digest('hex'), id = createHash('sha256').update(image.toLowerCase()).digest('hex');
+  const hash = createHash('sha256').update(fs.readFileSync(image)).digest('hex');
+  const realImage = fs.realpathSync(image);
+  const id = createHash('sha256').update(process.platform === 'win32' ? realImage.toLowerCase() : realImage).digest('hex');
   fs.writeFileSync(path.join(f.dir, '.hook-request.json'), JSON.stringify({ nonce, attachments: [{ path: image, sha256: hash }] }));
   const proof = path.join(f.dir, `.hook-view-${nonce}-${id}.json`);
   const run = (mode, extra = {}) => spawnSync(process.execPath, [path.resolve('scripts/antigravity-tools-hook.mjs'), mode, f.dir], { cwd: f.dir, input: JSON.stringify({ conversationId, stepIdx: 0, toolCall: { name: 'view_file', args: { AbsolutePath: image } }, ...extra }), encoding: 'utf8', windowsHide: true });

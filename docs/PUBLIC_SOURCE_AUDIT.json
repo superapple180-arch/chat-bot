@@ -5,11 +5,11 @@
   "inputs": [
     {
       "file": "package-lock.json",
-      "sha256": "cfcc3c687a16b5981aedc695165349fb23da1422763793c167d65b1b438766d0"
+      "sha256": "83a8bf8feb5a2af958eeae6b9c76ccccfc6386dd668e152f375ddfb11db707f8"
     },
     {
       "file": "desktop-app/package-lock.json",
-      "sha256": "294343e50f2115c866586c8ebb0ce64e6f2d139cf6a92b283416139c6218f79b"
+      "sha256": "d8c28398b7e9fab66b1e205493d22481a2b20717bb13dca5a5b1280f2db2d267"
     },
     {
       "file": "requirements-voice.txt",
@@ -69,7 +69,7 @@
     },
     {
       "file": "desktop-app/package-lock.json",
-      "sha256": "294343e50f2115c866586c8ebb0ce64e6f2d139cf6a92b283416139c6218f79b"
+      "sha256": "d8c28398b7e9fab66b1e205493d22481a2b20717bb13dca5a5b1280f2db2d267"
     },
     {
       "file": "desktop-app/package.json",
@@ -517,7 +517,7 @@
     },
     {
       "file": "test/antigravity.test.mjs",
-      "sha256": "3fe51599962fb8d19696fdcf30cdd2be0d7460f843477417112275fd9392b61e"
+      "sha256": "6325257ea7406f61e24430ad41000f19429892a187fda64cda53798c310f5fac"
     },
     {
       "file": "test/attachments.test.mjs",
@@ -585,7 +585,7 @@
     },
     {
       "file": "test/security-20261031.test.mjs",
-      "sha256": "b37e9f866d751da21bbba2870ed9316833fe2506caf3712ba7e57cf97d3a6236"
+      "sha256": "b3c68476ae9b25f0ddbd3f422fecbf8f6a9c305817884c08293b964569d3b774"
     },
     {
       "file": "test/security.test.mjs",
